@@ -38,7 +38,9 @@ unsigned char cursor = '0';
 unsigned char key;
 unsigned char count = 0;
 
-double song1[99] = {0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1.23}; //1.23 terminated for each song
+double song1[99] = {293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 
+	293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 
+	392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 1.23}; //1.23 terminated for each song
 double song2[99] = {0 ,1.23};
 double song3[99] = {0 ,1.23};
 double song4[99] = {0 ,1.23};
@@ -287,21 +289,25 @@ int Menu(int state1) {
 		case Menu_song1_play:
 		if (key == '0' || song1[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
+			set_PWM(0);
 		}
 		break;
 		case Menu_song2_play:
 		if (key == '0' || song2[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
+			set_PWM(0);
 		}
 		break;
 		case Menu_song3_play:
 		if (key == '0' || song3[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
+			set_PWM(0);
 		}
 		break;
 		case Menu_song4_play:
 		if (key == '0' || song4[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
+			set_PWM(0);
 		}
 		break;
 		case Menu_chang_button_wait:
@@ -641,7 +647,7 @@ int main(void)
 	tasks[i].TickFct = &Record_change;
 
 	DDRA = 0xFF; PORTA = 0x00; // LCD
-	//DDRB = 0xFF; PORTB = 0x00;
+	DDRB = 0xFF; PORTB = 0x00;
 	DDRD = 0xFF; PORTD = 0x00; // LCD
 	DDRC = 0xF0; PORTC = 0x0F; //keypad
 	LCD_init();
@@ -692,8 +698,7 @@ int main(void)
 		LCD_Cursor(32);
 		LCD_WriteData(key);
 		LCD_Cursor(31);
-		LCD_WriteData(count + '0');
-		
+		LCD_WriteData(count + '0');		
 		
 		while(!TimerFlag);
 		TimerFlag = 0;
