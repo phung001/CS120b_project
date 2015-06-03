@@ -16,6 +16,7 @@ double EEMEM eeprom_song1[50];
 double EEMEM eeprom_song2[50];
 double EEMEM eeprom_song3[50];
 double EEMEM eeprom_song4[50];
+
 unsigned char EEMEM eeprom_buttons[8];
 unsigned char EEMEM eeprom_check;
 
@@ -24,21 +25,25 @@ unsigned char EEMEM eeprom_check;
 double notes[16] = {261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88,
 523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50, 0};
 
-unsigned char* button_notes[16] = {"C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "PB5", "C6", "00"};
+char* button_notes[16] = {"C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6", "00"};
 
 unsigned char buttons[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 
 unsigned char check = 0;
 unsigned char button_hand;
 unsigned char button_shake;
+unsigned char record_hand;
+unsigned char record_shake;
 unsigned char cursor = '0';
 unsigned char key;
-/*
-double song1[50] = { ,1.23}; //1 terminated for each song
-double song2[50] = { ,1.23};
-double song3[50] = { ,1.23};
-double song4[50] = { ,1.23};
-*/
+unsigned char count = 0;
+
+double song1[99] = {0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1.23}; //1.23 terminated for each song
+double song2[99] = {0 ,1.23};
+double song3[99] = {0 ,1.23};
+double song4[99] = {0 ,1.23};
+double song_temp[99];
+
 
 //--------Task scheduler data structure--------------------
 // Struct for Tasks represent a running process in our
@@ -54,8 +59,8 @@ typedef struct _task {
 	//Task tick function
 	int (*TickFct)(int);
 } task;
-task tasks[3];
-const unsigned char numTasks=3;
+task tasks[5];
+const unsigned char numTasks=5;
 
 enum keypad_states{SM_1};
 
@@ -138,27 +143,27 @@ int Keypad_movement(int state) {
 
 	switch(state) { // State actions
 		case Keypad_init:
-//		LCD_DisplayString(1, "init");
+		//		LCD_DisplayString(1, "init");
 		cursor = '0';
 		break;
 		case Keypad_wait:
-//		LCD_DisplayString(1, "wait");
+		//		LCD_DisplayString(1, "wait");
 		break;
 		case Keypad_down:
-//		LCD_DisplayString(1, "down");
+		//		LCD_DisplayString(1, "down");
 		break;
 		case Keypad_up:
-//		LCD_DisplayString(1, "up");
+		//		LCD_DisplayString(1, "up");
 		break;
 		case Keypad_enter_back:
-//		LCD_DisplayString(1, "enter/back");
+		//		LCD_DisplayString(1, "enter/back");
 		break;
 		default: // ADD default behaviour below
 		break;
 	} // State actions
 
-//	LCD_Cursor(11);
-//	LCD_WriteData(cursor+'0');
+	//	LCD_Cursor(11);
+	//	LCD_WriteData(cursor+'0');
 	return state;
 }
 
@@ -185,6 +190,7 @@ int Menu(int state1) {
 		}
 		else if (key == '2') {
 			state1 = Menu_chang_button_wait;
+			button_hand = 1;
 		}
 		else{ //else
 			state1 = Menu_button_wait;
@@ -218,15 +224,19 @@ int Menu(int state1) {
 		}
 		else if (cursor == '0' && key == '2') {
 			state1 = Menu_song1_record;
+			record_hand = 1;
 		}
 		else if (cursor == '1' && key == '2') {
 			state1 = Menu_song2_record;
+			record_hand = 1;
 		}
 		else if (cursor == '2' && key == '2') {
 			state1 = Menu_song3_record;
+			record_hand = 1;
 		}
 		else if (cursor == '3' && key == '2') {
 			state1 = Menu_song4_record;
+			record_hand = 1;
 		}
 		else{
 			state1 = Menu_record_wait;
@@ -239,15 +249,19 @@ int Menu(int state1) {
 		}
 		else if (cursor == '0' && key == '2') {
 			state1 = Menu_song1_play;
+			count = 0;
 		}
 		else if (cursor == '1' && key == '2') {
 			state1 = Menu_song2_play;
+			count = 0;
 		}
 		else if (cursor == '2' && key == '2') {
 			state1 = Menu_song3_play;
+			count = 0;
 		}
 		else if (cursor == '3' && key == '2') {
 			state1 = Menu_song4_play;
+			count = 0;
 		}
 		else{
 			state1 = Menu_play_wait;
@@ -271,51 +285,72 @@ int Menu(int state1) {
 		}
 		break;
 		case Menu_song1_play:
-		if (key == '0') {
+		if (key == '0' || song1[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
 		}
 		break;
 		case Menu_song2_play:
-		if (key == '0') {
+		if (key == '0' || song2[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
 		}
 		break;
 		case Menu_song3_play:
-		if (key == '0') {
+		if (key == '0' || song3[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
 		}
 		break;
 		case Menu_song4_play:
-		if (key == '0') {
+		if (key == '0' || song4[count] == 1.23 || count >= 50) {
 			state1 = Menu_play_wait;
 		}
 		break;
 		case Menu_chang_button_wait:
 		if (button_shake == 0) {
 			state1 = Menu_button_wait;
+			button_hand = 0;
 		}
 		else if (button_shake != 0) {
 			state1 = Menu_chang_button_wait;
 		}
 		break;
 		case Menu_song1_record:
-		if (key == '0') {
+		if (record_shake == 0) {
 			state1 = Menu_record_wait;
+			record_hand = 0;
+		}
+		else{
+			state1 = Menu_song1_record;
+			record_hand = 1;
 		}
 		break;
 		case Menu_song2_record:
-		if (key == '0') {
+		if (record_shake == 0) {
 			state1 = Menu_record_wait;
+			record_hand = 0;
+		}
+		else{
+			state1 = Menu_song2_record;
+			record_hand = 1;
 		}
 		break;
 		case Menu_song3_record:
-		if (key == '0') {
+		if (record_shake == 0) {
 			state1 = Menu_record_wait;
+			record_hand = 0;
+		}
+		else{
+			state1 = Menu_song3_record;
+			record_hand = 1;
 		}
 		break;
 		case Menu_song4_record:
-		if (key == '0') {
+		if (record_shake == 0) {
 			state1 = Menu_record_wait;
+			record_hand = 0;
+		}
+		else{
+			state1 = Menu_song4_record;
+			record_hand = 1;
 		}
 		break;
 		default:
@@ -324,19 +359,29 @@ int Menu(int state1) {
 
 	switch(state1) { // State actions
 		case Menu_init:
+		button_hand = 0;
+		record_hand = 0;
 		break;
 		case Menu_button_wait:
-		button_hand = 0;
 		LCD_DisplayString(1, "Press enter to  change a button");
 		break;
 		case Menu_main_wait:
-		LCD_DisplayString(1, main_disp[cursor]);
+		if(cursor == '0') LCD_DisplayString(1, main_disp[0]);
+		else if(cursor == '1') LCD_DisplayString(1, main_disp[1]);
+		else if(cursor == '2') LCD_DisplayString(1, main_disp[2]);
+		else if(cursor == '3') LCD_DisplayString(1, main_disp[3]);
 		break;
 		case Menu_record_wait:
-		LCD_DisplayString(1, song_disp[cursor]);
+		if(cursor == '0') LCD_DisplayString(1, song_disp[0]);
+		else if(cursor == '1') LCD_DisplayString(1, song_disp[1]);
+		else if(cursor == '2') LCD_DisplayString(1, song_disp[2]);
+		else if(cursor == '3') LCD_DisplayString(1, song_disp[3]);
 		break;
 		case Menu_play_wait:
-		LCD_DisplayString(1, song_disp[cursor]);
+		if(cursor == '0') LCD_DisplayString(1, song_disp[0]);
+		else if(cursor == '1') LCD_DisplayString(1, song_disp[1]);
+		else if(cursor == '2') LCD_DisplayString(1, song_disp[2]);
+		else if(cursor == '3') LCD_DisplayString(1, song_disp[3]);
 		break;
 		case Menu_reset_wait:
 		LCD_DisplayString(1, "Press ENTER to  reset or go back");
@@ -347,40 +392,48 @@ int Menu(int state1) {
 		case Menu_song1_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 1");
+		set_PWM(song1[count]);
+		count++;
 		break;
 		case Menu_song2_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 2");
+		set_PWM(song1[count]);
+		count++;
 		break;
 		case Menu_song3_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 3");
+		set_PWM(song1[count]);
+		count++;
 		break;
 		case Menu_song4_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 4");
+		set_PWM(song1[count]);
+		count++;
 		break;
 		case Menu_chang_button_wait:
 		//do the chang_button state machine
-		button_hand = 1;
+		//button_hand = 1;
 		break;
 		case Menu_song1_record:
-		LCD_DisplayString(1, "Now recording:   Song 1");
+		//LCD_DisplayString(1, "Now recording:   Song 1");
 		break;
 		case Menu_song2_record:
-		LCD_DisplayString(1, "Now recording:   Song 1");
+		//LCD_DisplayString(1, "Now recording:   Song 1");
 		break;
 		case Menu_song3_record:
-		LCD_DisplayString(1, "Now recording:   Song 1");
+		//LCD_DisplayString(1, "Now recording:   Song 1");
 		break;
 		case Menu_song4_record:
-		LCD_DisplayString(1, "Now recording:   Song 1");
+		//LCD_DisplayString(1, "Now recording:   Song 1");
 		break;
 		default: // ADD default behaviour below
 		break;
 	} // State actions
 	return state1;
-} 
+}
 
 //-----------------------------------------------------------------------------------------------
 enum Button_States { Button_init, Button_wait, Button_change, Button_note_up, Button_note_down } Button_State;
@@ -394,19 +447,23 @@ int button_change(int state) {
 		state = Button_init;
 		break;
 		case Button_init:
-		if (1) {
+		if (button_hand == 1) {
 			state = Button_wait;
+			button_shake = 1;
+		}
+		else{
+			state = Button_init;
 		}
 		break;
 		case Button_wait:
-		if ((position = GetButton()) && button_hand == 1) {
+		if (key == '#' || key == '9' || key == '6' || key == '3' || key == 'D' || key == 'C' || key == 'B' || key == 'A') {
 			state = Button_change;
-			button_shake = 1;
-			position = button_position(position);
-			cap_but = note_position(position, buttons);
+			position = button_position(key);
+			cap_but = button_position(key);
+			cap_but = buttons[cap_but];
 		}
 		else if (key == '0') {
-			state = Button_wait;
+			state = Button_init;
 			button_shake = 0;
 		}
 		else{
@@ -423,15 +480,15 @@ int button_change(int state) {
 			cap_but++;
 		}
 		else if (key == '0') {
-			state = Button_wait;
+			state = Button_init;
 			set_PWM(0);
 			button_shake = 0;
 		}
 		else if (key == '2') {
-			Button_State = Button_wait;
+			state = Button_init;
 			set_PWM(0);
 			buttons[position] = cap_but;
-			update_eeprom_word(&eeprom_buttons[position], cap_but);
+			write_eeprom_word(&eeprom_buttons[position], cap_but);
 			button_shake = 0;
 		}
 		else{
@@ -460,7 +517,7 @@ int button_change(int state) {
 
 	switch(state) { // State actions
 		case Button_init:
-		button_shake = 0;
+		//button_shake = 0;
 		break;
 		case Button_wait:
 		LCD_DisplayString(1, "Press the buttonto change");
@@ -468,14 +525,12 @@ int button_change(int state) {
 		case Button_change:
 		LCD_DisplayString(1, "Current note:");
 		LCD_Cursor(15);
-		LCD_WriteData(button_notes[cap_but]);
+		LCD_WriteData(button_notes[cap_but][0]);
 		LCD_Cursor(16);
-		LCD_WriteData(button_notes[cap_but]);
+		LCD_WriteData(button_notes[cap_but][1]);
 
 		set_PWM(notes[cap_but]);
-		while (!TimerFlag){}
-		TimerFlag = 0;
-		TimerSet(GCD);
+		
 		break;
 		case Button_note_up:
 		break;
@@ -483,9 +538,73 @@ int button_change(int state) {
 		break;
 		default: // ADD default behaviour below
 		break;
-	} // State actions	
+	} // State actions
 	return state;
-} 
+}
+//-----------------------------------------------------------------------------------------------
+
+enum Record_States { Record_init, Record_wait, Record_go } Record_State;
+int Record_change(int state) {
+
+	switch(state) { // Transitions
+		case -1:
+		state = Record_init;
+		break;
+		case Record_init:
+		if (record_hand == 1){
+			state = Record_wait;
+			record_shake = 1;
+		}
+		else{
+			state = Record_init;
+		}
+		break;
+		case Record_wait:
+		if(key == '#' || key == '9' || key == '6' || key == '3' || key == 'D' || key == 'C' || key == 'B' || key == 'A'){
+			state = Record_go;
+		}
+		else if(key == '0'){
+			state = Record_init;
+			record_shake = 0;
+		}
+		else{
+			state = Record_wait;
+		}
+		break;
+		case Record_go:
+		if(key == '2' || count >= 98){
+			state = Record_init;
+			record_shake = 0;
+		}
+		else if(key == '0'){
+			state = Record_wait;
+		}
+		else{
+			state = Record_go;
+		}
+		break;	
+		default:
+		state = Record_init;
+		break;
+	} // Transitions
+
+	switch(state) { // State actions
+		case Record_init:
+		break;
+		case Record_wait:
+		count = 0;
+		LCD_DisplayString(1, "Press a note to start.");
+		break;
+		case Record_go:
+		LCD_DisplayString(1, "**Recording**");
+		count++;
+		break;
+		
+		default: // ADD default behaviour below
+		break;
+	} // State actions
+	return state;
+}
 //-----------------------------------------------------------------------------------------------
 
 // --------END User defined FSMs---------------------------// Implement scheduler code from PES.
@@ -493,19 +612,19 @@ int main(void)
 {
 	unsigned char i=0;
 	tasks[i].state = SM_1;
-	tasks[i].period = 1;
+	tasks[i].period = 2;
 	tasks[i].elapsedTime = 1;
 	tasks[i].TickFct = &tick_getkeys;
 	++i;
 	
 	tasks[i].state = Keypad_init;
-	tasks[i].period = 4;
+	tasks[i].period = 2;
 	tasks[i].elapsedTime = 1;
 	tasks[i].TickFct = &Keypad_movement;
 	++i;
 	
 	tasks[i].state = Menu_init;
-	tasks[i].period = 3;
+	tasks[i].period = 4;
 	tasks[i].elapsedTime = 1;
 	tasks[i].TickFct = &Menu;
 	++i;
@@ -514,6 +633,12 @@ int main(void)
 	tasks[i].period = 4;
 	tasks[i].elapsedTime = 1;
 	tasks[i].TickFct = &button_change;
+	++i;
+
+	tasks[i].state = Record_init;
+	tasks[i].period = 4;
+	tasks[i].elapsedTime = 1;
+	tasks[i].TickFct = &Record_change;
 
 	DDRA = 0xFF; PORTA = 0x00; // LCD
 	//DDRB = 0xFF; PORTB = 0x00;
@@ -524,18 +649,21 @@ int main(void)
 	
 	check = read_eeprom_word(&eeprom_check);
 	if(check != 1){
-		update_eeprom_word(&eeprom_check, 1);
+		write_eeprom_word(&eeprom_check, 1);
+		check = 1;
 		
 		int j = 0;
 		while(j < 8){
-			buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			write_eeprom_word(&eeprom_buttons[j], buttons[j]);
 			j++;
 		}
 	}
 	else{
 		int j = 0;
 		while(j < 8){
-			update_eeprom_word(&eeprom_buttons[j], buttons[j]);
+			//update_eeprom_word(&eeprom_buttons[j], buttons[j]);
+			buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
 			j++;
 		}
 	}
@@ -543,7 +671,7 @@ int main(void)
 	PWM_on();
 	TimerOn();
 	
-	TimerSet(50);
+	TimerSet(25);
 	TimerOn();
 
 	while(1)
@@ -563,6 +691,9 @@ int main(void)
 		
 		LCD_Cursor(32);
 		LCD_WriteData(key);
+		LCD_Cursor(31);
+		LCD_WriteData(count + '0');
+		
 		
 		while(!TimerFlag);
 		TimerFlag = 0;
