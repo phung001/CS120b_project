@@ -283,18 +283,6 @@ void play_song(double song[]){
 	return;
 };
 
-unsigned char note_position(char key, unsigned char button[]){
-	if(key == '#') return button[0];
-	else if(key == '9') return button[1];
-	else if(key == '6') return button[2];
-	else if(key == '3') return button[3];
-	else if(key == 'D') return button[4];
-	else if(key == 'C') return button[5];
-	else if(key == 'B') return button[6];
-	else if(key == 'A') return button[7];
-	else return 15; //returns no note
-}
-
 unsigned char button_position(char key){
 	if(key == '#') return 0;
 	else if(key == '9') return 1;
@@ -306,20 +294,3 @@ unsigned char button_position(char key){
 	else if(key == 'A') return 7;
 	else return '\0'; //returns no note
 }
-
-/*
-//this should be in states
-void record_song(double (&song)[50]){
-	TimerSet(200);
-	unsigned char s1 = 0;
-	unsigned char position;
-	
-	while(s1 < 49 && key != '2'){
-		position = note_position(key);
-		
-		
-		s1++;
-	}
-	
-};
-*/
