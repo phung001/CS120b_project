@@ -269,20 +269,6 @@ unsigned long int b)
 //--------End find GCD function ---------------------------
 const unsigned long GCD=25; // fix, find right GCD
 
-void play_song(double song[]){
-	TimerSet(200);
-	unsigned char s1 = 0;
-	
-	while(song[s1] != 1){
-		set_PWM(song[s1]);
-		while (!TimerFlag){}
-		TimerFlag = 0;
-		s1++;
-	}
-	TimerSet(GCD);
-	return;
-};
-
 unsigned char button_position(char key){
 	if(key == '#') return 0;
 	else if(key == '9') return 1;
