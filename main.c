@@ -12,13 +12,14 @@
 #define update_eeprom_word(address,value) eeprom_update_word ((uint16_t*)address,(uint16_t)value)
 
 //declare an eeprom array
-double EEMEM eeprom_song1[50];
-double EEMEM eeprom_song2[50];
-double EEMEM eeprom_song3[50];
-double EEMEM eeprom_song4[50];
+double EEMEM eeprom_song1[99];
+double EEMEM eeprom_song2[99];
+double EEMEM eeprom_song3[99];
+double EEMEM eeprom_song4[99];
 
 unsigned char EEMEM eeprom_buttons[8];
 unsigned char EEMEM eeprom_check;
+unsigned char check = 0;
 
 //----------------------------------------------------------------------------------------
 
@@ -29,7 +30,6 @@ char* button_notes[16] = {"C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", 
 
 unsigned char buttons[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 
-unsigned char check = 0;
 unsigned char button_hand;
 unsigned char button_shake;
 unsigned char record_hand;
@@ -38,13 +38,14 @@ unsigned char cursor = '0';
 unsigned char key;
 unsigned char count = 0;
 
-double song1[99] = {293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 
-	293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 
-	392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 1.23}; //1.23 terminated for each song
+double song1[99] = {293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66,
+	293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 293.66, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00,
+392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 392.00, 1.23}; //1.23 terminated for each song
 double song2[99] = {0 ,1.23};
 double song3[99] = {0 ,1.23};
 double song4[99] = {0 ,1.23};
 double song_temp[99];
+unsigned char which_song = 0;
 
 
 //--------Task scheduler data structure--------------------
@@ -227,18 +228,22 @@ int Menu(int state1) {
 		else if (cursor == '0' && key == '2') {
 			state1 = Menu_song1_record;
 			record_hand = 1;
+			which_song = 1;
 		}
 		else if (cursor == '1' && key == '2') {
 			state1 = Menu_song2_record;
 			record_hand = 1;
+			which_song = 2;
 		}
 		else if (cursor == '2' && key == '2') {
 			state1 = Menu_song3_record;
 			record_hand = 1;
+			which_song = 3;
 		}
 		else if (cursor == '3' && key == '2') {
 			state1 = Menu_song4_record;
 			record_hand = 1;
+			which_song = 4;
 		}
 		else{
 			state1 = Menu_record_wait;
@@ -287,25 +292,25 @@ int Menu(int state1) {
 		}
 		break;
 		case Menu_song1_play:
-		if (key == '0' || song1[count] == 1.23 || count >= 50) {
+		if (key == '0' || song1[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
 			set_PWM(0);
 		}
 		break;
 		case Menu_song2_play:
-		if (key == '0' || song2[count] == 1.23 || count >= 50) {
+		if (key == '0' || song2[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
 			set_PWM(0);
 		}
 		break;
 		case Menu_song3_play:
-		if (key == '0' || song3[count] == 1.23 || count >= 50) {
+		if (key == '0' || song3[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
 			set_PWM(0);
 		}
 		break;
 		case Menu_song4_play:
-		if (key == '0' || song4[count] == 1.23 || count >= 50) {
+		if (key == '0' || song4[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
 			set_PWM(0);
 		}
@@ -404,19 +409,19 @@ int Menu(int state1) {
 		case Menu_song2_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 2");
-		set_PWM(song1[count]);
+		set_PWM(song2[count]);
 		count++;
 		break;
 		case Menu_song3_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 3");
-		set_PWM(song1[count]);
+		set_PWM(song3[count]);
 		count++;
 		break;
 		case Menu_song4_play:
 		//play the song
 		LCD_DisplayString(1, "Now playing:     Song 4");
-		set_PWM(song1[count]);
+		set_PWM(song4[count]);
 		count++;
 		break;
 		case Menu_chang_button_wait:
@@ -578,17 +583,72 @@ int Record_change(int state) {
 		}
 		break;
 		case Record_go:
-		if(key == '2' || count >= 98){
+		if(count >= 98){
 			state = Record_init;
+			set_PWM(0);
 			record_shake = 0;
+			int pp = 0;
+			while (pp < 98){
+				if (which_song == 1) {
+					song1[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song1[pp], song_temp[pp]);
+				}
+				else if (which_song == 2) {
+					song2[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song2[pp], song_temp[pp]);
+				}
+				else if (which_song == 3) {
+					song3[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song3[pp], song_temp[pp]);
+				}
+				else if (which_song == 4) {
+					song4[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song4[pp], song_temp[pp]);
+				}
+				pp++;
+			}
+		}
+		else if(key == '2'){
+			state = Record_init;
+			set_PWM(0);
+			record_shake = 0;
+			int pp = 0;
+			song_temp[count+1] = 1.23;
+			while (pp < 99){
+				if (which_song == 1) {
+					song1[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song1[pp], song_temp[pp]);
+				}
+				else if (which_song == 2) {
+					song2[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song2[pp], song_temp[pp]);
+				}
+				else if (which_song == 3) {
+					song3[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song3[pp], song_temp[pp]);
+				}
+				else if (which_song == 4) {
+					song4[pp] = song_temp[pp];
+					write_eeprom_word(&eeprom_song4[pp], song_temp[pp]);
+				}
+				pp++;
+			}
 		}
 		else if(key == '0'){
 			state = Record_wait;
 		}
 		else{
+			if(key == '#' || key == '9' || key == '6' || key == '3' || key == 'D' || key == 'C' || key == 'B' || key == 'A'){
+				song_temp[count] = notes[buttons[button_position(key)]];
+				set_PWM(song_temp[count]);
+			}
+			else{
+				song_temp[count] = 0;
+				set_PWM(0);
+			}
 			state = Record_go;
 		}
-		break;	
+		break;
 		default:
 		state = Record_init;
 		break;
@@ -664,12 +724,60 @@ int main(void)
 			write_eeprom_word(&eeprom_buttons[j], buttons[j]);
 			j++;
 		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			write_eeprom_word(&eeprom_song1[j], song1[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			write_eeprom_word(&eeprom_song2[j], song2[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			write_eeprom_word(&eeprom_song3[j], song3[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			write_eeprom_word(&eeprom_song4[j], song4[j]);
+			j++;
+		}
 	}
 	else{
 		int j = 0;
 		while(j < 8){
 			//update_eeprom_word(&eeprom_buttons[j], buttons[j]);
 			buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			song1[j] = read_eeprom_word(&eeprom_song1[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			song2[j] = read_eeprom_word(&eeprom_song2[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			song3[j] = read_eeprom_word(&eeprom_song3[j]);
+			j++;
+		}
+		j = 0;
+		while(j < 98){
+			//buttons[j] = read_eeprom_word(&eeprom_buttons[j]);
+			song4[j] = read_eeprom_word(&eeprom_song4[j]);
 			j++;
 		}
 	}
@@ -698,7 +806,7 @@ int main(void)
 		LCD_Cursor(32);
 		LCD_WriteData(key);
 		LCD_Cursor(31);
-		LCD_WriteData(count + '0');		
+		LCD_WriteData(count + '0');
 		
 		while(!TimerFlag);
 		TimerFlag = 0;
