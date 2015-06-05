@@ -4,6 +4,7 @@
 #include <avr/eeprom.h>
 #include "./path/io.c"
 #include "./path/io.h"
+#include "./path/songs.c"
 
 //-------------------------------------------------------------------------------------
 // macro for easier usage
@@ -40,8 +41,8 @@ unsigned char key;
 unsigned char count = 0;
 
 //double song1[99] = {};
-double song2[99] = {0 ,1.23};
-double song3[99] = {0 ,1.23};
+//double song2[99] = {0 ,1.23};
+//double song3[99] = {0 ,1.23};
 //double song4[99] = {0 ,1.23};
 double song_temp[99];
 unsigned char which_song = 0;
@@ -362,21 +363,21 @@ int Menu(int state1) {
 		case Menu_song2_play:
 		if (key == '0' || song2[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[1]);
 			set_PWM(0);
 		}
 		break;
 		case Menu_song3_play:
 		if (key == '0' || song3[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[2]);
 			set_PWM(0);
 		}
 		break;
 		case Menu_song4_play:
 		if (key == '0' || song4[count] == 1.23 || count >= 99) {
 			state1 = Menu_play_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[3]);
 			set_PWM(0);
 		}
 		break;
@@ -404,7 +405,7 @@ int Menu(int state1) {
 		case Menu_song2_record:
 		if (record_shake == 0) {
 			state1 = Menu_record_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[1]);
 			record_hand = 0;
 		}
 		else{
@@ -415,7 +416,7 @@ int Menu(int state1) {
 		case Menu_song3_record:
 		if (record_shake == 0) {
 			state1 = Menu_record_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[2]);
 			record_hand = 0;
 		}
 		else{
@@ -426,7 +427,7 @@ int Menu(int state1) {
 		case Menu_song4_record:
 		if (record_shake == 0) {
 			state1 = Menu_record_wait;
-			LCD_DisplayString(1, song_disp[0]);
+			LCD_DisplayString(1, song_disp[3]);
 			record_hand = 0;
 		}
 		else{
