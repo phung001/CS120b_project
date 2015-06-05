@@ -40,10 +40,6 @@ unsigned char cursor = '0';
 unsigned char key;
 unsigned char count = 0;
 
-//double song1[99] = {};
-//double song2[99] = {0 ,1.23};
-//double song3[99] = {0 ,1.23};
-//double song4[99] = {0 ,1.23};
 double song_temp[99];
 unsigned char which_song = 0;
 
@@ -72,18 +68,6 @@ int tick_getkeys(int state)
 	key=GetKeypadKey();
 	return state;
 }
-
-
-//-----------------------------------------------------------------------------------------------
-
-/*
-static char button_layout[8];
-static double song1[];
-static double song2[];
-static double song3[];
-static double song4[];
-*/
-
 
 //-----------------------------------------------------------------------------------------------
 enum Keypad_States { Keypad_init, Keypad_wait, Keypad_down, Keypad_up, Keypad_enter_back } Keypad_State;
@@ -176,6 +160,7 @@ int Menu(int state1) {
 
 	const char*  main_disp[4] = {"-Play Songs     Record Songs", "-Record Songs   Change Button", "-Change Button  Reset All", "-Reset All"};
 	const char*  song_disp[4] = {"-Song #1        Song #2", "-Song #2        Song #3", "-Song #3        Song #4", "-Song #4"};
+	unsigned char r = 0;
 
 	switch(state1) { // Transitions
 		case -1:
@@ -455,6 +440,35 @@ int Menu(int state1) {
 		case Menu_reset_wait:
 		break;
 		case Menu_reset:
+		while (r < 8){
+			buttons[r] = r;
+			write_eeprom_word(&eeprom_buttons[r], r);
+			r++;
+		}
+		r = 0;
+		while (r < 98){
+			song1[r] = song1_temp[r];
+			write_eeprom_word(&eeprom_song1[r], song1_temp[r]);
+			r++;
+		}
+		r = 0;
+		while (r < 98){
+			song2[r] = song2_temp[r];
+			write_eeprom_word(&eeprom_song2[r], song2_temp[r]);
+			r++;
+		}
+		r = 0;
+		while (r < 98){
+			song3[r] = song3_temp[r];
+			write_eeprom_word(&eeprom_song3[r], song3_temp[r]);
+			r++;
+		}
+		r = 0;
+		while (r < 98){
+			song4[r] = song4_temp[r];
+			write_eeprom_word(&eeprom_song4[r], song4_temp[r]);
+			r++;
+		}
 		break;
 		case Menu_song1_play:
 		set_PWM(song1[count]);
