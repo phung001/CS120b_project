@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
-#include "./path/io.c"
-#include "./path/io.h"
-#include "./path/songs.c"
+#include "io.c"
+#include "io.h"
+#include "songs.c"
 
 //-------------------------------------------------------------------------------------
 // macro for easier usage
